@@ -1,4 +1,5 @@
 import { Server } from "socket.io"
+import registerPollHandlers from "./poll.socket.js"
 
 export const initSocket = (server) => {
   const io = new Server(server, {
@@ -6,6 +7,6 @@ export const initSocket = (server) => {
   })
 
   io.on("connection", (socket) => {
-    console.log("connected", socket.id)
+    registerPollHandlers(io, socket)
   })
 }
