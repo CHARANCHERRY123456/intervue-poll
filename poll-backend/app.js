@@ -4,9 +4,9 @@ import helmet from "helmet"
 import morgan from "morgan"
 import { rateLimiter } from "./config/rateLimit.js"
 import { corsOptions } from "./config/cors.js"
-// import router from "./routes/index.js"
-// import notFound from "./middleware/notFound.js"
-// import errorHandler from "./middleware/errorHandler.js"
+import router from "./routes/index.js"
+import notFound from "./middleware/notFound.js"
+import errorHandler from "./middleware/errorHandler.js"
 
 const app = express()
 
@@ -16,9 +16,9 @@ app.use(morgan("dev"))
 app.use(rateLimiter)
 app.use(express.json())
 
-// app.use("/api", router)
+app.use("/api", router)
 
-// app.use(notFound)
-// app.use(errorHandler)
+app.use(notFound)
+app.use(errorHandler)
 
 export default app;
