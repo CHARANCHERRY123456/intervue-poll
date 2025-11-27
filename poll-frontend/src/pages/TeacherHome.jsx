@@ -5,6 +5,7 @@ import { useCreatePollMutation } from "../features/poll/pollApi"
 import { socket } from "../app/socket"
 import { emitAskQuestion } from "../utils/socketActions"
 import { useNavigate } from "react-router-dom"
+import Logo from "../components/Logo"
 
 export default function TeacherHome() {
   const dispatch = useDispatch()
@@ -13,8 +14,11 @@ export default function TeacherHome() {
 
   const [createPoll] = useCreatePollMutation()
 
-  const [question, setQuestion] = useState("what is your favorite color?")
-  const [options, setOptions] = useState(["red", "blue", "white", "green"])
+  const [question, setQuestion] = useState("")
+  const [options, setOptions] = useState([
+    { text: "", isCorrect: true },
+    { text: "", isCorrect: false }
+  ])
   const [timeLimit, setTimeLimit] = useState(60)
 
   useEffect(() => {
@@ -36,40 +40,135 @@ export default function TeacherHome() {
     }
   }, [])
 
+  const updateOption = (i, text) => {
+    const arr = [...options]
+    arr[i].text = text
+    setOptions(arr)
+  }
+
+  const toggleCorrect = (i, value) => {
+    const arr = [...options]
+    arr[i].isCorrect = value
+    setOptions(arr)
+  }
+
+  const addOption = () => {
+    setOptions([...options, { text: "", isCorrect: false }])
+  }
+
   const ask = () => {
-    emitAskQuestion({ pollId, question, options, timeLimit })
+    const optionTexts = options.map(o => o.text)
+    emitAskQuestion({ pollId, question, options: optionTexts, timeLimit })
     navigate("/teacher/live")
   }
 
+  const charCount = question.length
+
   return (
-    <div className="p-8 flex flex-col gap-5 max-w-xl mx-auto">
-      <p className="text-gray-700">Poll ID: {pollId}</p>
+    <div className="min-h-screen bg-gray-50 p-8">
+      <div className="max-w-4xl mx-auto">
+        <Logo />
 
-      <input className="border p-3 rounded-lg" value={question} onChange={e=>setQuestion(e.target.value)} placeholder="Question" />
+        <div className="mt-8">
+          <h1 className="text-4xl font-bold text-gray-900">Let's Get Started</h1>
+          <p className="text-gray-500 mt-2">
+            you'll have the ability to create and manage polls, ask questions, and monitor your students' responses in real-time.
+          </p>
+        </div>
 
-      {options.map((opt, i) => (
-        <input
-          key={i}
-          className="border p-3 rounded-lg"
-          value={opt}
-          onChange={e => {
-            const arr = [...options]
-            arr[i] = e.target.value
-            setOptions(arr)
-          }}
-          placeholder={`Option ${i + 1}`}
-        />
-      ))}
+        <div className="mt-10">
+          <div className="flex items-center justify-between mb-3">
+            <label className="text-base font-semibold text-gray-900">Enter your question</label>
+              <div className="flex items-center gap-2">
+                <select
+                  value={timeLimit}
+                  onChange={e => setTimeLimit(Number(e.target.value))}
+                  className="text-sm bg-white border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400"
+                >
+                  <option value={30}>30 seconds</option>
+                  <option value={60}>60 seconds</option>
+                  <option value={90}>90 seconds</option>
+                </select>
+              </div>
+          </div>
 
-      <select className="border p-3 rounded-lg" value={timeLimit} onChange={e=>setTimeLimit(Number(e.target.value))}>
-        <option value={30}>30s</option>
-        <option value={60}>60s</option>
-        <option value={90}>90s</option>
-      </select>
+          <textarea
+            className="w-full border border-gray-300 rounded-lg p-4 bg-gray-100 text-gray-900 resize-none focus:outline-none focus:ring-2 focus:ring-purple-500"
+            rows="4"
+            value={question}
+            onChange={e => setQuestion(e.target.value)}
+            placeholder="Rahul Bajaj"
+            maxLength={100}
+          />
+          <div className="text-right text-sm text-gray-500 mt-1">{charCount}/100</div>
+        </div>
 
-      <button onClick={ask} className="bg-purple-600 text-white py-3 rounded-xl text-lg">
-        Ask Question
-      </button>
+        <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <h3 className="text-base font-semibold text-gray-900 mb-3">Edit Options</h3>
+            <div className="flex flex-col gap-3">
+              {options.map((opt, i) => (
+                <div key={i} className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-purple-600 text-white flex items-center justify-center font-semibold text-sm">
+                    {i + 1}
+                  </div>
+                  <input
+                    className="flex-1 border border-gray-300 rounded-lg p-3 bg-gray-100 text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    value={opt.text}
+                    onChange={e => updateOption(i, e.target.value)}
+                    placeholder="Rahul Bajaj"
+                  />
+                </div>
+              ))}
+              <button 
+                onClick={addOption}
+                className="text-purple-600 text-sm font-medium self-start mt-2 hover:text-purple-700"
+              >
+                + Add More option
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <h3 className="text-base font-semibold text-gray-900 mb-3">Is it Correct?</h3>
+            <div className="flex flex-col gap-3">
+              {options.map((opt, i) => (
+                <div key={i} className="flex items-center gap-4 h-[52px]">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name={`correct-${i}`}
+                      checked={opt.isCorrect}
+                      onChange={() => toggleCorrect(i, true)}
+                      className="w-5 h-5 text-purple-600 accent-purple-600"
+                    />
+                    <span className="text-gray-700 font-medium">Yes</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name={`correct-${i}`}
+                      checked={!opt.isCorrect}
+                      onChange={() => toggleCorrect(i, false)}
+                      className="w-5 h-5 text-gray-400 accent-gray-400"
+                    />
+                    <span className="text-gray-700 font-medium">No</span>
+                  </label>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-10 flex justify-end">
+          <button 
+            onClick={ask} 
+            className="px-8 py-3 bg-purple-600 text-white font-semibold rounded-full hover:bg-purple-700 transition-colors"
+          >
+            Ask Question
+          </button>
+        </div>
+      </div>
     </div>
   )
 }
