@@ -3,7 +3,13 @@ import { useEffect } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { socket } from "../app/socket"
 import { addMessage } from "../features/ui/uiSlice"
-import { setActiveQuestion, setResults } from "../features/poll/pollSlice"
+import { 
+  setActiveQuestion,
+  setResults,
+  setTimer,
+  setStudents,
+  finalizeResults
+} from "../features/poll/pollSlice"
 import { setKicked } from "../features/student/studentSlice"
 
 export const useSockets = () => {
@@ -21,10 +27,22 @@ export const useSockets = () => {
       else navigate("/student/question")
     })
 
-    socket.on("question:results", (r) => {
+    socket.on("timer:update", (t) => {
+      dispatch(setTimer(t))
+    })
+
+    socket.on("results:update", (r) => {
       dispatch(setResults(r))
+    })
+
+    socket.on("question:results", (r) => {
+      dispatch(finalizeResults(r))
       if (isTeacher) navigate("/teacher/results")
       else navigate("/student/results")
+    })
+
+    socket.on("students:update", (list) => {
+      dispatch(setStudents(list))
     })
 
     socket.on("student:kicked", () => {
@@ -32,16 +50,18 @@ export const useSockets = () => {
       navigate("/student/kicked")
     })
 
-    // Chat listener
     socket.on("chat:new", (msg) => {
       dispatch(addMessage(msg))
     })
 
     return () => {
       socket.off("question:new")
+      socket.off("timer:update")
+      socket.off("results:update")
       socket.off("question:results")
+      socket.off("students:update")
       socket.off("student:kicked")
       socket.off("chat:new")
     }
-  }, [pollId])
+  }, [pollId, isTeacher])
 }

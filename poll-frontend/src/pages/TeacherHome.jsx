@@ -26,8 +26,8 @@ export default function TeacherHome() {
     }
   }, [])
 
-  const [question, setQuestion] = useState("")
-  const [options, setOptions] = useState(["", "", "", ""])
+  const [question, setQuestion] = useState("what is 2?")
+  const [options, setOptions] = useState(["1", "2", "1", "1"])
   const [timeLimit, setTimeLimit] = useState(60)
 
   const ask = () => {

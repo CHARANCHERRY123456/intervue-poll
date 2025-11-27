@@ -1,6 +1,10 @@
 import { polls, students } from "../data/store.js"
 
 export default function registerPollHandlers(io, socket) {
+  socket.on("join_room", (pollId) => {
+    socket.join(pollId)
+  })
+
   socket.on("teacher:join", (pollId) => {
     socket.join(pollId)
     socket.emit("teacher:joined")
