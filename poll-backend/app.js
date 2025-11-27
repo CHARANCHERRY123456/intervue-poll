@@ -4,9 +4,9 @@ import helmet from "helmet"
 import morgan from "morgan"
 import { rateLimiter } from "./config/rateLimit.js"
 import { corsOptions } from "./config/cors.js"
-import router from "./routes/index.js"
 import notFound from "./middleware/notFound.js"
 import errorHandler from "./middleware/errorHandler.js"
+import router from "./routes/poll.routes.js"
 
 const app = express()
 
