@@ -3,6 +3,9 @@ import { useState } from "react"
 import { emitSubmitAnswer } from "../utils/socketActions"
 import { setHasAnswered } from "../features/student/studentSlice"
 import { useNavigate } from "react-router-dom"
+import { toggleChat, toggleParticipants } from "../features/ui/uiSlice"
+import ChatBox from "../components/ChatBox"
+import Participants from "../components/Participants"
 
 export default function StudentQuestion() {
   const dispatch = useDispatch()
@@ -12,6 +15,8 @@ export default function StudentQuestion() {
   const pollId = useSelector(s=>s.poll.pollId)
   const timer = useSelector(s=>s.poll.timer)
   const hasAnswered = useSelector(s=>s.student.hasAnswered)
+  const showChat = useSelector(s => s.ui.isChatOpen)
+  const showPart = useSelector(s => s.ui.isParticipantsOpen)
 
   const [selected, setSelected] = useState("")
 
@@ -22,6 +27,7 @@ export default function StudentQuestion() {
   }
 
   return (
+    <>
     <div className="p-8 max-w-xl mx-auto flex flex-col gap-5">
       <h2 className="text-xl font-semibold">{q?.question}</h2>
       <div className="text-2xl font-bold text-blue-600">{timer}s</div>
@@ -39,5 +45,13 @@ export default function StudentQuestion() {
         </button>
       )}
     </div>
+
+    <button onClick={()=>dispatch(toggleChat())} className="fixed bottom-4 right-4 bg-purple-600 text-white p-4 rounded-full shadow-lg" aria-pressed={showChat} aria-label="Toggle chat">Chat</button>
+
+    <button onClick={()=>dispatch(toggleParticipants())} className="fixed bottom-4 left-4 bg-blue-600 text-white p-4 rounded-full shadow-lg" aria-pressed={showPart} aria-label="Toggle participants">Users</button>
+
+    {showChat && <ChatBox />}
+    {showPart && <Participants />}
+    </>
   )
 }

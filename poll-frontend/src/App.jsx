@@ -11,10 +11,14 @@ import Kicked from "./pages/Kicked"
 import { useSockets } from "./hooks/useSockets"
 
 export default function App() {
-  useSockets()
+  function SocketManager() {
+    useSockets()
+    return null
+  }
 
   return (
     <BrowserRouter>
+      <SocketManager />
       <Routes>
         <Route path="/" element={<RoleSelect />} />
 

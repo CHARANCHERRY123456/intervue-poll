@@ -1,11 +1,13 @@
 import { useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
+import { useNavigate } from "react-router-dom"
 import { emitAskQuestion } from "../utils/socketActions"
 import { setPageState } from "../features/ui/uiSlice"
 
 export default function TeacherHome() {
   const dispatch = useDispatch()
   const pollId = useSelector(s => s.poll.pollId)
+  const navigate = useNavigate()
 
   const [question, setQuestion] = useState("")
   const [options, setOptions] = useState(["", "", "", ""])
@@ -16,6 +18,7 @@ export default function TeacherHome() {
     dispatch(setPageState("teacher_live"))
     navigate("/teacher/live")
   }
+
 
 
   return (

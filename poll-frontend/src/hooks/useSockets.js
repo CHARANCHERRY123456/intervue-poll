@@ -1,4 +1,7 @@
 import { useNavigate } from "react-router-dom"
+import { useEffect } from "react"
+import { useDispatch, useSelector } from "react-redux"
+import { addMessage } from "../features/ui/uiSlice"
 
 export const useSockets = () => {
   const dispatch = useDispatch()
@@ -26,10 +29,16 @@ export const useSockets = () => {
       navigate("/student/kicked")
     })
 
+    // Chat listener
+    socket.on("chat:new", (msg) => {
+      dispatch(addMessage(msg))
+    })
+
     return () => {
       socket.off("question:new")
       socket.off("question:results")
       socket.off("student:kicked")
+      socket.off("chat:new")
     }
   }, [pollId])
 }

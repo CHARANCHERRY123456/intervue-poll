@@ -1,7 +1,7 @@
 import { useSelector } from "react-redux"
 import { useDispatch } from "react-redux"
 import { setPageState } from "../features/ui/uiSlice"
-import { clearQuestion } from "../features/poll/pollSlice"
+import { clearActiveQuestion } from "../features/poll/pollSlice"
 
 export default function TeacherResults() {
   const dispatch = useDispatch()
@@ -9,7 +9,7 @@ export default function TeacherResults() {
   const q = useSelector(s=>s.poll.activeQuestion)
 
   const next = () => {
-    dispatch(clearQuestion())
+    dispatch(clearActiveQuestion())
     dispatch(setPageState("teacher_home"))
   }
 
