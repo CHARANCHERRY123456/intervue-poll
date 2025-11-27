@@ -32,7 +32,7 @@ export default function StudentQuestion() {
       <h2 className="text-xl font-semibold">{q?.question}</h2>
       <div className="text-2xl font-bold text-blue-600">{timer}s</div>
 
-      {q?.options.map((o,i)=>(
+      {q?.options?.map((o,i)=>(
         <label key={i} className="p-3 border rounded-lg flex gap-3 items-center cursor-pointer">
           <input type="radio" name="opt" value={o} disabled={hasAnswered} onChange={()=>setSelected(o)} />
           {o}

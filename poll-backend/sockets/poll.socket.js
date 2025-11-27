@@ -49,9 +49,18 @@ export default function registerPollHandlers(io, socket) {
   })
 
   socket.on("student:answer", ({ pollId, answer }) => {
+    console.log(pollId , answer);
+    
     const r = polls[pollId].currentResults
     r[answer] = (r[answer] || 0) + 1
     io.to(pollId).emit("results:update", r)
+  })
+  socket.on("teacher:new_question", (pollId) => {
+    if (polls[pollId]) {
+      polls[pollId].activeQuestion = null
+      polls[pollId].currentResults = {}
+    }
+    io.to(pollId).emit("question:cleared")
   })
 
   socket.on("teacher:end_question", (pollId) => {

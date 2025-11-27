@@ -8,9 +8,10 @@ import {
   setResults,
   setTimer,
   setStudents,
-  finalizeResults
+  finalizeResults,
+  clearActiveQuestion
 } from "../features/poll/pollSlice"
-import { setKicked } from "../features/student/studentSlice"
+import { setKicked } from "../features/student/studentSlice";
 
 export const useSockets = () => {
   const dispatch = useDispatch()
@@ -33,6 +34,9 @@ export const useSockets = () => {
 
     socket.on("results:update", (r) => {
       dispatch(setResults(r))
+    })
+     socket.on("question:cleared", () => {
+      dispatch(clearActiveQuestion())
     })
 
     socket.on("question:results", (r) => {
@@ -61,6 +65,7 @@ export const useSockets = () => {
       socket.off("question:results")
       socket.off("students:update")
       socket.off("student:kicked")
+      socket.off("question:cleared")
       socket.off("chat:new")
     }
   }, [pollId, isTeacher])

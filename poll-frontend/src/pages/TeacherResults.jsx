@@ -1,33 +1,34 @@
-import { useSelector } from "react-redux"
-import { useDispatch } from "react-redux"
-import { setPageState } from "../features/ui/uiSlice"
+import { useSelector, useDispatch } from "react-redux"
 import { clearActiveQuestion } from "../features/poll/pollSlice"
+import { socket } from "../app/socket"
+import { useNavigate } from "react-router-dom"
 
 export default function TeacherResults() {
-  const dispatch = useDispatch()
-  const results = useSelector(s=>s.poll.results)
-  const q = useSelector(s=>s.poll.activeQuestion)
+  const pollId = useSelector(s => s.poll.pollId)
+  const question = useSelector(s => s.poll.activeQuestion)
+  const results = useSelector(s => s.poll.results)
 
-  const next = () => {
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
+
+  const askNew = () => {
+    socket.emit("teacher:new_question", pollId)
     dispatch(clearActiveQuestion())
-    dispatch(setPageState("teacher_home"))
+    navigate("/teacher")
   }
 
   return (
     <div className="p-8 max-w-xl mx-auto flex flex-col gap-5">
-      <h2 className="text-xl font-semibold">{q?.question}</h2>
+      <h2 className="text-xl font-semibold">{question?.question}</h2>
 
-      {Object.keys(results).map((opt,i)=>(
+      {question?.options?.map((opt, i) => (
         <div key={i} className="border p-3 rounded-lg flex justify-between">
           <span>{opt}</span>
-          <span>{results[opt]}</span>
+          <span>{results[opt] || 0}</span>
         </div>
       ))}
 
-      <button
-        onClick={next}
-        className="bg-purple-600 text-white py-3 rounded-xl text-lg mt-5"
-      >
+      <button onClick={askNew} className="bg-purple-600 text-white py-3 rounded-xl text-lg mt-6">
         Ask New Question
       </button>
     </div>

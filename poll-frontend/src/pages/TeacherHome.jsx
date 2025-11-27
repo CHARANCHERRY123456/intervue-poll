@@ -1,55 +1,67 @@
-import { useState, useEffect } from "react"
+import { useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
-import { useNavigate } from "react-router-dom"
-import { emitAskQuestion, emitJoinTeacher } from "../utils/socketActions"
-import { setPageState } from "../features/ui/uiSlice"
 import { setPollId } from "../features/poll/pollSlice"
-import { setTeacher } from "../features/teacher/teacherSlice"
 import { useCreatePollMutation } from "../features/poll/pollApi"
+import { socket } from "../app/socket"
+import { emitAskQuestion } from "../utils/socketActions"
+import { useNavigate } from "react-router-dom"
 
 export default function TeacherHome() {
   const dispatch = useDispatch()
-  const pollId = useSelector(s => s.poll.pollId)
   const navigate = useNavigate()
+  const pollId = useSelector(s => s.poll.pollId)
+
   const [createPoll] = useCreatePollMutation()
 
+  const [question, setQuestion] = useState("what is your favorite color?")
+  const [options, setOptions] = useState(["red", "blue", "white", "green"])
+  const [timeLimit, setTimeLimit] = useState(60)
+
   useEffect(() => {
-    if (!pollId) {
+    const saved = localStorage.getItem("pollId")
+
+    if (!pollId && !saved) {
       createPoll("Teacher").then(res => {
-        if (res.data?.pollId) {
-          const id = res.data.pollId
-          dispatch(setPollId(id))
-          dispatch(setTeacher("Teacher"))
-          emitJoinTeacher(id)
-        }
+        const id = res.data.pollId
+        dispatch(setPollId(id))
+        socket.emit("teacher:join", id)
+        socket.emit("join_room", id)
+        localStorage.setItem("pollId", id)
       })
+    } else {
+      const id = pollId || saved
+      dispatch(setPollId(id))
+      socket.emit("teacher:join", id)
+      socket.emit("join_room", id)
     }
   }, [])
 
-  const [question, setQuestion] = useState("what is 2?")
-  const [options, setOptions] = useState(["1", "2", "1", "1"])
-  const [timeLimit, setTimeLimit] = useState(60)
-
   const ask = () => {
     emitAskQuestion({ pollId, question, options, timeLimit })
-    dispatch(setPageState("teacher_live"))
     navigate("/teacher/live")
   }
 
-
-
   return (
     <div className="p-8 flex flex-col gap-5 max-w-xl mx-auto">
-      {pollId && <p className="text-center text-gray-600 font-semibold">Poll ID: <span className="text-purple-600">{pollId}</span></p>}
-      <input value={question} onChange={(e)=>setQuestion(e.target.value)} placeholder="Enter question" className="border p-3 rounded-lg" />
+      <p className="text-gray-700">Poll ID: {pollId}</p>
+
+      <input className="border p-3 rounded-lg" value={question} onChange={e=>setQuestion(e.target.value)} placeholder="Question" />
 
       {options.map((opt, i) => (
-        <input key={i} value={opt} onChange={(e)=> {
-          const arr=[...options]; arr[i]=e.target.value; setOptions(arr)
-        }} placeholder={`Option ${i+1}`} className="border p-3 rounded-lg" />
+        <input
+          key={i}
+          className="border p-3 rounded-lg"
+          value={opt}
+          onChange={e => {
+            const arr = [...options]
+            arr[i] = e.target.value
+            setOptions(arr)
+          }}
+          placeholder={`Option ${i + 1}`}
+        />
       ))}
 
-      <select value={timeLimit} onChange={(e)=>setTimeLimit(Number(e.target.value))} className="border p-3 rounded-lg">
+      <select className="border p-3 rounded-lg" value={timeLimit} onChange={e=>setTimeLimit(Number(e.target.value))}>
         <option value={30}>30s</option>
         <option value={60}>60s</option>
         <option value={90}>90s</option>

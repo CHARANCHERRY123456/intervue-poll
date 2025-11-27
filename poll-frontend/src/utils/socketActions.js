@@ -13,6 +13,8 @@ export const emitAskQuestion = (payload) => {
 }
 
 export const emitSubmitAnswer = (payload) => {
+  console.log(payload);
+  
   socket.emit("student:answer", payload)
 }
 

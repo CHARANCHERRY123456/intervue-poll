@@ -26,7 +26,7 @@ export default function TeacherLiveQuestion() {
       <h2 className="text-xl font-semibold">{q?.question}</h2>
       <div className="text-2xl font-bold text-purple-600">{timer}s</div>
 
-      {q?.options.map((o,i)=>(
+      {q?.options?.map((o,i)=>(
         <div key={i} className="p-3 border rounded-lg flex justify-between">
           <span>{o}</span>
           <span>{results[o] || 0}</span>
