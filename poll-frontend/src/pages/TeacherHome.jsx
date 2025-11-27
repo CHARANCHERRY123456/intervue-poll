@@ -1,13 +1,30 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { useNavigate } from "react-router-dom"
-import { emitAskQuestion } from "../utils/socketActions"
+import { emitAskQuestion, emitJoinTeacher } from "../utils/socketActions"
 import { setPageState } from "../features/ui/uiSlice"
+import { setPollId } from "../features/poll/pollSlice"
+import { setTeacher } from "../features/teacher/teacherSlice"
+import { useCreatePollMutation } from "../features/poll/pollApi"
 
 export default function TeacherHome() {
   const dispatch = useDispatch()
   const pollId = useSelector(s => s.poll.pollId)
   const navigate = useNavigate()
+  const [createPoll] = useCreatePollMutation()
+
+  useEffect(() => {
+    if (!pollId) {
+      createPoll("Teacher").then(res => {
+        if (res.data?.pollId) {
+          const id = res.data.pollId
+          dispatch(setPollId(id))
+          dispatch(setTeacher("Teacher"))
+          emitJoinTeacher(id)
+        }
+      })
+    }
+  }, [])
 
   const [question, setQuestion] = useState("")
   const [options, setOptions] = useState(["", "", "", ""])
@@ -23,6 +40,7 @@ export default function TeacherHome() {
 
   return (
     <div className="p-8 flex flex-col gap-5 max-w-xl mx-auto">
+      {pollId && <p className="text-center text-gray-600 font-semibold">Poll ID: <span className="text-purple-600">{pollId}</span></p>}
       <input value={question} onChange={(e)=>setQuestion(e.target.value)} placeholder="Enter question" className="border p-3 rounded-lg" />
 
       {options.map((opt, i) => (

@@ -1,27 +1,30 @@
 import { useNavigate } from "react-router-dom"
 import { useEffect } from "react"
 import { useDispatch, useSelector } from "react-redux"
+import { socket } from "../app/socket"
 import { addMessage } from "../features/ui/uiSlice"
+import { setActiveQuestion, setResults } from "../features/poll/pollSlice"
+import { setKicked } from "../features/student/studentSlice"
 
 export const useSockets = () => {
   const dispatch = useDispatch()
   const pollId = useSelector((s) => s.poll.pollId)
+  const isTeacher = useSelector((s) => s.teacher.isTeacher)
   const navigate = useNavigate()
 
   useEffect(() => {
     if (!pollId) return
 
-    socket.emit("join_room", pollId)
-
     socket.on("question:new", (q) => {
       dispatch(setActiveQuestion(q))
-      navigate("/student/question")
+      if (isTeacher) navigate("/teacher/live")
+      else navigate("/student/question")
     })
 
     socket.on("question:results", (r) => {
-      dispatch(finalizeResults(r))
-      navigate("/student/results")
-      navigate("/teacher/results")
+      dispatch(setResults(r))
+      if (isTeacher) navigate("/teacher/results")
+      else navigate("/student/results")
     })
 
     socket.on("student:kicked", () => {
