@@ -8,7 +8,7 @@ import StudentHome from "./pages/StudentHome"
 import WaitingRoom from "./pages/WaitingRoom"
 import StudentQuestion from "./pages/StudentQuestion"
 import StudentResults from "./pages/StudentResults"
-import Kicked from "./pages/Kicked"
+import Kicked from "./pages/kicked"
 import { useSockets } from "./hooks/useSockets"
 import Toasts from "./components/Toasts"
 

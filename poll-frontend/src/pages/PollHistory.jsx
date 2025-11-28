@@ -21,7 +21,8 @@ export default function PollHistory() {
       return
     }
     
-    fetch(`http://localhost:5000/api/poll/${pollId}/history`)
+      const apiBase = import.meta?.env?.VITE_BACKEND_URL || 'http://localhost:5000'
+      fetch(`${apiBase}/api/poll/${pollId}/history`)
       .then(res => res.json())
       .then(data => {
         setHistory(data)
