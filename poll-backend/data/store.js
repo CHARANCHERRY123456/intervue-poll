@@ -8,7 +8,8 @@ export function ensurePoll(pollId) {
       activeQuestion: null, 
       currentResults: {}, 
       interval: null,
-      remaining: null
+      remaining: null,
+      answeredStudents: new Set()
     }
   }
   return polls[pollId]

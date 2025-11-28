@@ -30,7 +30,7 @@ export const useSockets = () => {
       if (isTeacher) navigate("/teacher/live")
       else {
         // show a small toast for students
-        dispatch(pushToast({ id: Date.now(), message: "New question posted" }))
+        // dispatch(pushToast({ id: Date.now(), message: "New question posted" }))
         navigate("/student/question")
       }
     })

@@ -36,6 +36,7 @@ export default function registerPollHandlers(io, socket) {
     }
     polls[pollId].activeQuestion = q
     polls[pollId].currentResults = {}
+    polls[pollId].answeredStudents = new Set()
 
     io.to(pollId).emit("question:new", q)
 
@@ -57,6 +58,7 @@ export default function registerPollHandlers(io, socket) {
 
         polls[pollId].activeQuestion = null
         polls[pollId].remaining = null
+        polls[pollId].answeredStudents.clear()
       }
     }, 1000)
 
@@ -69,6 +71,29 @@ export default function registerPollHandlers(io, socket) {
     r[answer] = (r[answer] || 0) + 1
     polls[pollId].currentResults = r
     io.to(pollId).emit("results:update", r)
+
+    // Track which student answered
+    polls[pollId].answeredStudents.add(socket.id)
+    
+    // Check if all students have answered
+    const totalStudents = students[pollId] ? students[pollId].length : 0
+    const answeredCount = polls[pollId].answeredStudents.size
+    
+    if (totalStudents > 0 && answeredCount >= totalStudents) {
+      // All students answered, end the question immediately
+      if (polls[pollId].interval) {
+        clearInterval(polls[pollId].interval)
+        polls[pollId].interval = null
+      }
+      
+      io.to(pollId).emit("question:results", polls[pollId].currentResults)
+      
+      addQuestionToHistory(pollId, polls[pollId].activeQuestion.question, polls[pollId].activeQuestion.options, polls[pollId].currentResults)
+      
+      polls[pollId].activeQuestion = null
+      polls[pollId].remaining = null
+      polls[pollId].answeredStudents.clear()
+    }
   })
   socket.on("teacher:new_question", (pollId) => {
     if (polls[pollId]) {
@@ -79,6 +104,7 @@ export default function registerPollHandlers(io, socket) {
         polls[pollId].interval = null
       }
       polls[pollId].remaining = null
+      polls[pollId].answeredStudents = new Set()
     }
     io.to(pollId).emit("question:cleared")
   })
@@ -92,12 +118,12 @@ export default function registerPollHandlers(io, socket) {
       q.interval = null
     }
     io.to(pollId).emit("question:results", q.currentResults)
-    // clear remaining timer
     q.remaining = null
     
     addQuestionToHistory(pollId, q.activeQuestion.question, q.activeQuestion.options, q.currentResults)
     
     q.activeQuestion = null
+    q.answeredStudents.clear()
   })
 
   socket.on("teacher:kick", ({ pollId, studentId }) => {
