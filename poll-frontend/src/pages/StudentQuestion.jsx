@@ -3,9 +3,8 @@ import { useState, useEffect } from "react"
 import { emitSubmitAnswer } from "../utils/socketActions"
 import { setHasAnswered } from "../features/student/studentSlice"
 import { useNavigate } from "react-router-dom"
-import { toggleChat, toggleParticipants } from "../features/ui/uiSlice"
-import ChatBox from "../components/ChatBox"
-import Participants from "../components/Participants"
+import { toggleChat } from "../features/ui/uiSlice"
+import ChatParticipantsPanel from "../components/ChatParticipantsPanel"
 
 export default function StudentQuestion() {
   const dispatch = useDispatch()
@@ -16,7 +15,6 @@ export default function StudentQuestion() {
   const timer = useSelector(s=>s.poll.timer)
   const hasAnswered = useSelector(s=>s.student.hasAnswered)
   const showChat = useSelector(s => s.ui.isChatOpen)
-  const showPart = useSelector(s => s.ui.isParticipantsOpen)
 
   const [selected, setSelected] = useState("")
   
@@ -90,8 +88,7 @@ export default function StudentQuestion() {
       </svg>
     </button>
 
-    {showChat && <ChatBox />}
-    {showPart && <Participants />}
+    {showChat && <ChatParticipantsPanel />}
     </>
   )
 }

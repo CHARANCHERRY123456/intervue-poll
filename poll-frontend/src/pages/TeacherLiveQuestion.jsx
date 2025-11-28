@@ -1,9 +1,8 @@
 import { useSelector, useDispatch } from "react-redux"
 import { useEffect } from "react"
 import { useNavigate } from "react-router-dom"
-import { toggleChat, toggleParticipants } from "../features/ui/uiSlice"
-import ChatBox from "../components/ChatBox"
-import Participants from "../components/Participants"
+import { toggleChat } from "../features/ui/uiSlice"
+import ChatParticipantsPanel from "../components/ChatParticipantsPanel"
 
 export default function TeacherLiveQuestion() {
   const dispatch = useDispatch()
@@ -13,7 +12,6 @@ export default function TeacherLiveQuestion() {
   const results = useSelector(s=>s.poll.results)
   const timer = useSelector(s=>s.poll.timer)
   const showChat = useSelector(s => s.ui.isChatOpen)
-  const showPart = useSelector(s => s.ui.isParticipantsOpen)
 
   useEffect(()=>{
     if (timer === 0 && q) navigate("/teacher/results")
@@ -88,8 +86,7 @@ export default function TeacherLiveQuestion() {
       </svg>
     </button>
 
-    {showChat && <ChatBox />}
-    {showPart && <Participants />}
+    {showChat && <ChatParticipantsPanel />}
     </>
   )
 }

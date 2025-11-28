@@ -1,6 +1,12 @@
+import { useDispatch, useSelector } from "react-redux"
+import { toggleChat } from "../features/ui/uiSlice"
 import Logo from "../components/Logo"
+import ChatParticipantsPanel from "../components/ChatParticipantsPanel"
 
 export default function WaitingRoom() {
+  const dispatch = useDispatch()
+  const showChat = useSelector(s => s.ui.isChatOpen)
+
   return (
     <div className="min-h-screen bg-white flex items-center justify-center px-6">
       <div className="w-full max-w-3xl text-center">
@@ -16,13 +22,17 @@ export default function WaitingRoom() {
       </div>
 
       <button
-        aria-label="Open chat"
-        className="fixed bottom-6 right-6 w-14 h-14 rounded-full bg-indigo-500 shadow-lg flex items-center justify-center text-white"
+        onClick={() => dispatch(toggleChat())}
+        aria-label="Toggle chat"
+        aria-pressed={showChat}
+        className="fixed bottom-6 right-6 w-14 h-14 rounded-full bg-indigo-600 shadow-lg flex items-center justify-center text-white hover:bg-indigo-700 transition-colors"
       >
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M21 15a2 2 0 01-2 2H8l-5 4V5a2 2 0 012-2h14a2 2 0 012 2v10z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M21 15a2 2 0 01-2 2H8l-5 4V5a2 2 0 012-2h14a2 2 0 012 2v10z"/>
         </svg>
       </button>
+
+      {showChat && <ChatParticipantsPanel />}
     </div>
   )
 }
