@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
-import { setPollId } from "../features/poll/pollSlice"
+import { setPollId, setActiveQuestion, setTimer } from "../features/poll/pollSlice"
+import { setTeacher } from "../features/teacher/teacherSlice"
 import { useCreatePollMutation } from "../features/poll/pollApi"
 import { socket } from "../app/socket"
 import { emitAskQuestion } from "../utils/socketActions"
@@ -28,6 +29,7 @@ export default function TeacherHome() {
       createPoll("Teacher").then(res => {
         const id = res.data.pollId
         dispatch(setPollId(id))
+        dispatch(setTeacher("Teacher"))
         socket.emit("teacher:join", id)
         socket.emit("join_room", id)
         localStorage.setItem("pollId", id)
@@ -35,6 +37,7 @@ export default function TeacherHome() {
     } else {
       const id = pollId || saved
       dispatch(setPollId(id))
+      dispatch(setTeacher("Teacher"))
       socket.emit("teacher:join", id)
       socket.emit("join_room", id)
     }
@@ -58,9 +61,21 @@ export default function TeacherHome() {
 
   const ask = () => {
     const optionTexts = options.map(o => o.text)
-    emitAskQuestion({ pollId, question, options: optionTexts, timeLimit })
+    const q = { question, options: optionTexts, timeLimit }
+
+    // update teacher UI immediately so teacher doesn't rely on server echo
+    dispatch(setActiveQuestion(q))
+    dispatch(setTimer(timeLimit))
     navigate("/teacher/live")
-  }
+    if (!pollId) {
+      // pollId not ready yet — create one or warn
+      console.warn("Poll ID not ready — cannot emit question yet")
+      return
+    }
+
+    emitAskQuestion({ pollId, question, options: optionTexts, timeLimit })
+  };
+
 
   const charCount = question.length
 
@@ -68,6 +83,13 @@ export default function TeacherHome() {
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-4xl mx-auto">
         <Logo />
+
+        {/* Display Poll ID */}
+        <div className="mt-4">
+          <p className="text-sm font-medium text-gray-700">
+            <span className="font-semibold text-gray-900">Poll ID:</span> {pollId || "Loading..."}
+          </p>
+        </div>
 
         <div className="mt-8">
           <h1 className="text-4xl font-bold text-gray-900">Let's Get Started</h1>

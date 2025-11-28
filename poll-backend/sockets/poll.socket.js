@@ -1,4 +1,4 @@
-import { polls, students } from "../data/store.js"
+import { polls, students, ensurePoll } from "../data/store.js"
 
 export default function registerPollHandlers(io, socket) {
   socket.on("join_room", (pollId) => {
@@ -18,7 +18,9 @@ export default function registerPollHandlers(io, socket) {
   })
 
   socket.on("teacher:ask_question", ({ pollId, question, options, timeLimit }) => {
-      if (!polls[pollId]) return;
+      // ensure poll exists server-side
+      ensurePoll(pollId)
+      console.log("teacher:ask_question received for pollId:", pollId)
     const q = { question, options, timeLimit }
     polls[pollId].activeQuestion = q
     polls[pollId].currentResults = {}
@@ -49,10 +51,12 @@ export default function registerPollHandlers(io, socket) {
   })
 
   socket.on("student:answer", ({ pollId, answer }) => {
-    console.log(pollId , answer);
-    
-    const r = polls[pollId].currentResults
+    console.log("student:answer", pollId , answer);
+    // ensure poll exists and has results map
+    ensurePoll(pollId)
+    const r = polls[pollId].currentResults || {}
     r[answer] = (r[answer] || 0) + 1
+    polls[pollId].currentResults = r
     io.to(pollId).emit("results:update", r)
   })
   socket.on("teacher:new_question", (pollId) => {
