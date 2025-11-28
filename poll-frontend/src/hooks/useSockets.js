@@ -2,7 +2,8 @@ import { useNavigate } from "react-router-dom"
 import { useEffect } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { socket } from "../app/socket"
-import { addMessage } from "../features/ui/uiSlice"
+import { addMessage, pushToast } from "../features/ui/uiSlice"
+import { setHasAnswered } from "../features/student/studentSlice"
 import { 
   setActiveQuestion,
   setResults,
@@ -23,9 +24,15 @@ export const useSockets = () => {
     if (!pollId) return
 
     socket.on("question:new", (q) => {
+      // Reset student answered state so students can answer new question
+      dispatch(setHasAnswered(false))
       dispatch(setActiveQuestion(q))
       if (isTeacher) navigate("/teacher/live")
-      else navigate("/student/question")
+      else {
+        // show a small toast for students
+        dispatch(pushToast({ id: Date.now(), message: "New question posted" }))
+        navigate("/student/question")
+      }
     })
 
     socket.on("timer:update", (t) => {

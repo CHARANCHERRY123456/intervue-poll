@@ -23,7 +23,7 @@ export default function StudentQuestion() {
   useEffect(() => {
     // reset selection whenever a new question arrives
     setSelected("")
-  }, [q?.id])
+  }, [q?.question, q?.timeLimit])
   const submit = () => {
     if (!selected) return
     emitSubmitAnswer({ pollId, answer: selected })

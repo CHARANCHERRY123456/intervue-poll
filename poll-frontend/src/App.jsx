@@ -9,6 +9,7 @@ import StudentQuestion from "./pages/StudentQuestion"
 import StudentResults from "./pages/StudentResults"
 import Kicked from "./pages/Kicked"
 import { useSockets } from "./hooks/useSockets"
+import Toasts from "./components/Toasts"
 
 export default function App() {
   function SocketManager() {
@@ -19,6 +20,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <SocketManager />
+      <Toasts />
       <Routes>
         <Route path="/" element={<RoleSelect />} />
 
