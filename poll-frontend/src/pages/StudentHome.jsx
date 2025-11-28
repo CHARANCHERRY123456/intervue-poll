@@ -9,7 +9,7 @@ import Logo from "../components/Logo"
 
 export default function StudentHome() {
   const [name, setName] = useState("")
-  const [pollCode, setPollCode] = useState("")
+  const [pollCode, setPollCode] = useState("global_poll")
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
