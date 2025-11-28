@@ -26,7 +26,7 @@ export default function ChatParticipantsPanel() {
   }
 
   return (
-    <div className="fixed top-6 right-6 w-96 bg-white shadow-xl rounded-lg overflow-hidden border border-gray-200">
+    <div className="fixed bottom-24 right-6 w-96 bg-white shadow-xl rounded-lg overflow-hidden border border-gray-200">
       {/* Tabs */}
       <div className="flex border-b border-gray-200">
         <button
