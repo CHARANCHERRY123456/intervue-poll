@@ -12,18 +12,23 @@ export default function PollHistory() {
   
   const [history, setHistory] = useState([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
 
   useEffect(() => {
-    if (!pollId) return
+    if (!pollId) {
+      setError("No poll ID found")
+      setLoading(false)
+      return
+    }
     
-    fetch(`http://localhost:3000/api/poll/${pollId}/history`)
+    fetch(`http://localhost:5000/api/poll/${pollId}/history`)
       .then(res => res.json())
       .then(data => {
         setHistory(data)
         setLoading(false)
       })
       .catch(err => {
-        console.error("Failed to fetch history:", err)
+        setError(err.message)
         setLoading(false)
       })
   }, [pollId])
@@ -47,9 +52,13 @@ export default function PollHistory() {
             <div className="w-12 h-12 border-4 border-gray-200 border-t-indigo-600 rounded-full animate-spin mx-auto"></div>
             <p className="mt-4 text-gray-600">Loading history...</p>
           </div>
+        ) : error ? (
+          <div className="text-center py-12 bg-white rounded-lg border border-red-200">
+            <p className="text-red-600">{error}</p>
+          </div>
         ) : history.length === 0 ? (
           <div className="text-center py-12 bg-white rounded-lg border border-gray-200">
-            <p className="text-gray-500">No poll history yet</p>
+            <p className="text-gray-500">No poll history yet. Ask some questions first!</p>
           </div>
         ) : (
           <div className="space-y-8">

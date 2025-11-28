@@ -1,4 +1,4 @@
-import { polls, students, ensurePoll } from "../data/store.js"
+import { polls, students, ensurePoll, addQuestionToHistory } from "../data/store.js"
 
 export default function registerPollHandlers(io, socket) {
   socket.on("join_room", (pollId) => {
@@ -27,9 +27,7 @@ export default function registerPollHandlers(io, socket) {
   })
 
   socket.on("teacher:ask_question", ({ pollId, question, options, timeLimit }) => {
-      // ensure poll exists server-side
-      ensurePoll(pollId)
-      console.log("teacher:ask_question received for pollId:", pollId)
+    ensurePoll(pollId)
     const q = { question, options, timeLimit }
     // clear any existing interval for this poll to avoid duplicate timers
     if (polls[pollId].interval) {
@@ -42,30 +40,20 @@ export default function registerPollHandlers(io, socket) {
     io.to(pollId).emit("question:new", q)
 
     let t = timeLimit
-    // emit initial timer value immediately so clients see the starting time
-    // store remaining on poll so late joiners can get the current timer
     polls[pollId].remaining = t
     io.to(pollId).emit("timer:update", t)
-    // also emit initial empty results so teacher sees zeros immediately
     io.to(pollId).emit("results:update", polls[pollId].currentResults || {})
-    console.log("timer started", { pollId, timeLimit: t })
+    
     const interval = setInterval(() => {
       t--
-      // update remaining and broadcast
       polls[pollId].remaining = t
-      console.log("timer tick", { pollId, t })
       io.to(pollId).emit("timer:update", t)
 
       if (t <= 0) {
         clearInterval(interval)
         io.to(pollId).emit("question:results", polls[pollId].currentResults)
 
-        polls[pollId].history.push({
-          question,
-          options,
-          results: polls[pollId].currentResults,
-          endedAt: Date.now()
-        })
+        addQuestionToHistory(pollId, question, options, polls[pollId].currentResults)
 
         polls[pollId].activeQuestion = null
         polls[pollId].remaining = null
@@ -76,8 +64,6 @@ export default function registerPollHandlers(io, socket) {
   })
 
   socket.on("student:answer", ({ pollId, answer }) => {
-    console.log("student:answer", pollId , answer);
-    // ensure poll exists and has results map
     ensurePoll(pollId)
     const r = polls[pollId].currentResults || {}
     r[answer] = (r[answer] || 0) + 1
@@ -98,6 +84,7 @@ export default function registerPollHandlers(io, socket) {
   })
 
   socket.on("teacher:end_question", (pollId) => {
+    ensurePoll(pollId)
     const q = polls[pollId]
     if (!q || !q.activeQuestion) return
     if (q.interval) {
@@ -107,12 +94,9 @@ export default function registerPollHandlers(io, socket) {
     io.to(pollId).emit("question:results", q.currentResults)
     // clear remaining timer
     q.remaining = null
-    q.history.push({
-      question: q.activeQuestion.question,
-      options: q.activeQuestion.options,
-      results: q.currentResults,
-      endedAt: Date.now()
-    })
+    
+    addQuestionToHistory(pollId, q.activeQuestion.question, q.activeQuestion.options, q.currentResults)
+    
     q.activeQuestion = null
   })
 
