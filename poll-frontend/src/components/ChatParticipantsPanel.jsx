@@ -26,7 +26,7 @@ export default function ChatParticipantsPanel() {
   }
 
   return (
-    <div className="fixed top-4 right-4 w-80 bg-white shadow-xl rounded-lg overflow-hidden border border-gray-200">
+    <div className="fixed top-6 right-6 w-96 bg-white shadow-xl rounded-lg overflow-hidden border border-gray-200">
       {/* Tabs */}
       <div className="flex border-b border-gray-200">
         <button
@@ -58,40 +58,41 @@ export default function ChatParticipantsPanel() {
             {messages.length === 0 ? (
               <div className="text-center text-gray-400 text-sm mt-8">No messages yet</div>
             ) : (
-              messages.map((m, i) => (
-                <div key={i} className="flex flex-col gap-1">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-semibold text-gray-700">{m.user}</span>
-                    {m.time && (
-                      <span className="text-xs text-gray-400">{formatTime(m.time)}</span>
-                    )}
+              messages.map((m, i) => {
+                const isMine = m.user === (isTeacher ? "Teacher" : studentName)
+                return (
+                  <div key={i} className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}>
+                    <div className={`flex flex-col ${isMine ? 'items-end' : 'items-start'} max-w-[78%]`}> 
+                      <div className={`text-xs font-semibold ${isMine ? 'text-indigo-600' : 'text-gray-600'}`}>{m.user}</div>
+                      <div className={`mt-1 px-4 py-2 rounded-lg text-sm ${isMine ? 'bg-indigo-600 text-white rounded-br-none' : 'bg-gray-800 text-white'}`}>
+                        {m.message}
+                      </div>
+                      {m.time && (
+                        <div className={`text-xs text-gray-400 mt-1 ${isMine ? 'text-right' : ''}`}>{formatTime(m.time)}</div>
+                      )}
+                    </div>
                   </div>
-                  <div className="text-sm text-gray-800 bg-gray-50 rounded-lg px-3 py-2">
-                    {m.message}
-                  </div>
-                </div>
-              ))
+                )
+              })
             )}
           </div>
           
           {/* Chat Input */}
-          <div className="border-t border-gray-200 p-3 bg-gray-50">
-            <div className="flex gap-2">
+          <div className="border-t border-gray-200 p-3 bg-white">
+            <div className="flex gap-2 items-center">
               <input
                 type="text"
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                className="flex-1 px-3 py-2 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-300 text-sm"
                 value={text}
                 onChange={(e) => setText(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && send()}
-                placeholder="Type your message..."
+                placeholder="Type a message..."
               />
               <button
                 onClick={send}
                 disabled={!text.trim()}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  text.trim()
-                    ? "bg-indigo-600 text-white hover:bg-indigo-700"
-                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                  text.trim() ? 'bg-indigo-600 text-white hover:bg-indigo-700' : 'bg-gray-200 text-gray-400 cursor-not-allowed'
                 }`}
               >
                 Send

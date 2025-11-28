@@ -5,6 +5,7 @@ import { setHasAnswered } from "../features/student/studentSlice"
 import { useNavigate } from "react-router-dom"
 import { toggleChat } from "../features/ui/uiSlice"
 import ChatParticipantsPanel from "../components/ChatParticipantsPanel"
+import ParticipantsBadge from "../components/ParticipantsBadge"
 
 export default function StudentQuestion() {
   const dispatch = useDispatch()
@@ -40,14 +41,20 @@ export default function StudentQuestion() {
     <>
     <div className="min-h-screen flex items-start justify-center px-6 py-16 bg-gray-50">
       <div className="w-full max-w-3xl">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-gray-900">Question</h2>
-          <div className="flex items-center gap-2">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-red-600">
-              <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/>
-              <path d="M12 6v6l4 2" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-            </svg>
-            <span className="text-2xl font-bold text-red-600">{formatTimer(timer)}</span>
+        <div className="relative mb-6">
+          <div className="flex items-center gap-4">
+            <h2 className="text-2xl font-bold text-gray-900">Question 1</h2>
+            <div className="flex items-center gap-2 text-sm text-red-600 font-semibold">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className="text-red-600">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/>
+                <path d="M12 6v6l4 2" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+              </svg>
+              <span className="text-base text-red-600">{formatTimer(timer)}</span>
+            </div>
+          </div>
+
+          <div className="absolute top-0 right-0">
+            <ParticipantsBadge className="mr-2 mt-1" />
           </div>
         </div>
 
