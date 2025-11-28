@@ -45,19 +45,34 @@ export default function TeacherLiveQuestion() {
           <div className="p-6 space-y-3">
             {q?.options?.map((o,i)=>{
               const voteCount = results[o] || 0
+              const totalVotes = Object.values(results).reduce((sum, v) => sum + v, 0)
+              const percentage = totalVotes > 0 ? (voteCount / totalVotes) * 100 : 0
+              
               return (
                 <div
                   key={i}
-                  className="flex items-center justify-between gap-3 px-4 py-3 rounded-lg bg-gray-100 text-gray-800"
+                  className="relative rounded-lg overflow-hidden bg-gray-100"
                 >
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-gray-300 text-gray-700 flex items-center justify-center text-sm font-semibold shrink-0">
-                      {i+1}
+                  <div 
+                    className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-600 transition-all duration-500 ease-out"
+                    style={{ width: `${percentage}%` }}
+                  />
+                  <div className="relative flex items-center justify-between gap-3 px-4 py-3">
+                    <div className="flex items-center gap-3">
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold shrink-0 ${
+                        percentage > 0 ? 'bg-white text-indigo-600' : 'bg-gray-300 text-gray-700'
+                      }`}>
+                        {i+1}
+                      </div>
+                      <div className={`text-base font-medium ${
+                        percentage > 0 ? 'text-white' : 'text-gray-800'
+                      }`}>{o}</div>
                     </div>
-                    <div className="text-base font-medium">{o}</div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-semibold text-indigo-600">{voteCount} {voteCount === 1 ? 'vote' : 'votes'}</span>
+                    <div className="flex items-center gap-2">
+                      <span className={`text-sm font-semibold ${
+                        percentage > 0 ? 'text-white' : 'text-indigo-600'
+                      }`}>{voteCount} {voteCount === 1 ? 'vote' : 'votes'}</span>
+                    </div>
                   </div>
                 </div>
               )

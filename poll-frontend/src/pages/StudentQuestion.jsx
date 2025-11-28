@@ -42,7 +42,16 @@ export default function StudentQuestion() {
     <>
     <div className="min-h-screen flex items-start justify-center px-6 py-16 bg-gray-50">
       <div className="w-full max-w-3xl">
-        <h2 className="text-2xl font-bold mb-6 text-gray-900">Question</h2>
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-bold text-gray-900">Question</h2>
+          <div className="flex items-center gap-2">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-red-600">
+              <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/>
+              <path d="M12 6v6l4 2" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+            </svg>
+            <span className="text-2xl font-bold text-red-600">{formatTimer(timer)}</span>
+          </div>
+        </div>
 
         <div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
           <div className="bg-gray-700 text-white px-5 py-3 text-sm font-medium">{q?.question}</div>
