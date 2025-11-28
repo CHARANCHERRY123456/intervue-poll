@@ -40,33 +40,25 @@ export default function StudentQuestion() {
 
   return (
     <>
-    <div className="min-h-screen flex items-start justify-center px-6 py-12 bg-white">
+    <div className="min-h-screen flex items-start justify-center px-6 py-16 bg-gray-50">
       <div className="w-full max-w-3xl">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold">Question {q?.number ?? 1}</h3>
-          <div className="flex items-center gap-2 text-sm text-gray-700">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="text-red-600">
-              <path d="M12 7v5l3 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-            <span className="text-red-600 font-medium">{formatTimer(timer)}</span>
-          </div>
-        </div>
+        <h2 className="text-2xl font-bold mb-6 text-gray-900">Question</h2>
 
-        <div className="border border-purple-200 rounded-md overflow-hidden">
-          <div className="bg-gray-800 text-white px-4 py-3 text-sm">{q?.question}</div>
-          <div className="p-4 space-y-3 bg-white">
+        <div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+          <div className="bg-gray-700 text-white px-5 py-3 text-sm font-medium">{q?.question}</div>
+          <div className="p-6 space-y-3">
             {q?.options?.map((o,i)=>{
               const isSelected = selected === o
               return (
                 <div
                   key={i}
                   onClick={() => !hasAnswered && setSelected(o)}
-                  className={`flex items-center gap-4 p-3 rounded-md cursor-pointer border ${isSelected ? 'border-purple-400 bg-purple-50' : 'border-gray-200 bg-gray-50'}`}
+                  className={`flex items-center gap-3 px-4 py-3 rounded-lg cursor-pointer transition-all ${isSelected ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-800 hover:bg-gray-200'}`}
                 >
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm ${isSelected ? 'bg-purple-600 text-white' : 'bg-gray-300 text-gray-700'}`}>
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold shrink-0 ${isSelected ? 'bg-white text-indigo-600' : 'bg-gray-300 text-gray-700'}`}>
                     {i+1}
                   </div>
-                  <div className="text-gray-800">{o}</div>
+                  <div className="text-base font-medium">{o}</div>
                 </div>
               )
             })}
@@ -75,7 +67,7 @@ export default function StudentQuestion() {
 
         <div className="mt-6 flex justify-end">
           {!hasAnswered && (
-            <button onClick={submit} disabled={!selected} className={`px-8 py-3 rounded-full text-white font-medium ${selected ? 'bg-gradient-to-r from-purple-500 to-indigo-500 shadow-md' : 'bg-gray-300 cursor-not-allowed'}`}>
+            <button onClick={submit} disabled={!selected} className={`px-10 py-3 rounded-full text-white font-semibold transition-all ${selected ? 'bg-gradient-to-r from-indigo-500 to-purple-600 hover:shadow-lg' : 'bg-gray-300 cursor-not-allowed'}`}>
               Submit
             </button>
           )}
@@ -83,9 +75,11 @@ export default function StudentQuestion() {
       </div>
     </div>
 
-    <button onClick={()=>dispatch(toggleChat())} className="fixed bottom-4 right-4 bg-purple-600 text-white p-4 rounded-full shadow-lg" aria-pressed={showChat} aria-label="Toggle chat">Chat</button>
-
-    <button onClick={()=>dispatch(toggleParticipants())} className="fixed bottom-4 left-4 bg-blue-600 text-white p-4 rounded-full shadow-lg" aria-pressed={showPart} aria-label="Toggle participants">Users</button>
+    <button onClick={()=>dispatch(toggleChat())} className="fixed bottom-6 right-6 bg-indigo-600 text-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center hover:bg-indigo-700 transition-colors" aria-pressed={showChat} aria-label="Toggle chat">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <path d="M21 15a2 2 0 01-2 2H8l-5 4V5a2 2 0 012-2h14a2 2 0 012 2v10z"/>
+      </svg>
+    </button>
 
     {showChat && <ChatBox />}
     {showPart && <Participants />}
