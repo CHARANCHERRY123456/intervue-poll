@@ -64,7 +64,7 @@ export default function StudentHome() {
             />
 
             {/* Poll ID Input */}
-            <label className="block text-sm font-medium text-gray-700 mt-6 mb-2">Enter Poll ID</label>
+            <label className="block text-sm font-medium text-gray-700 mt-6 mb-2">Enter Poll ID(Ask Your Teacher or go to /teacher)</label>
             <input
               value={pollCode}
               onChange={e => setPollCode(e.target.value)}
