@@ -21,8 +21,6 @@ export const useSockets = () => {
   const navigate = useNavigate()
 
   useEffect(() => {
-    if (!pollId) return
-
     socket.on("question:new", (q) => {
       // Reset student answered state so students can answer new question
       dispatch(setHasAnswered(false))
@@ -75,5 +73,5 @@ export const useSockets = () => {
       socket.off("question:cleared")
       socket.off("chat:new")
     }
-  }, [pollId, isTeacher])
+  }, [isTeacher])
 }

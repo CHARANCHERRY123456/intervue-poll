@@ -15,6 +15,9 @@ export default function registerPollHandlers(io, socket) {
     students[pollId].push({ id: socket.id, name })
     socket.join(pollId)
     io.to(pollId).emit("students:update", students[pollId])
+    // Inform the joining socket which poll it joined (helpful for clients in production)
+    socket.emit("student:joined", { pollId })
+    console.log(`student joined: ${name} -> ${pollId}`)
     // If there's an active question for this poll, send it immediately to this joining socket
     const poll = polls[pollId]
     if (poll && poll.activeQuestion) {
@@ -28,6 +31,7 @@ export default function registerPollHandlers(io, socket) {
 
   socket.on("teacher:ask_question", ({ pollId, question, options, timeLimit }) => {
     ensurePoll(pollId)
+    console.log(`teacher asked question for poll ${pollId}: ${question}`)
     const q = { question, options, timeLimit }
     // clear any existing interval for this poll to avoid duplicate timers
     if (polls[pollId].interval) {

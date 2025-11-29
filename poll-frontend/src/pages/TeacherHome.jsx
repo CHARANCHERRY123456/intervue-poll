@@ -23,24 +23,12 @@ export default function TeacherHome() {
   const [timeLimit, setTimeLimit] = useState(60)
 
   useEffect(() => {
-    const saved = localStorage.getItem("pollId")
-
-    if (!pollId && !saved) {
-      createPoll("Teacher").then(res => {
-        const id = res.data.pollId
-        dispatch(setPollId(id))
-        dispatch(setTeacher("Teacher"))
-        socket.emit("teacher:join", id)
-        socket.emit("join_room", id)
-        localStorage.setItem("pollId", id)
-      })
-    } else {
-      const id = pollId || saved
-      dispatch(setPollId(id))
-      dispatch(setTeacher("Teacher"))
-      socket.emit("teacher:join", id)
-      socket.emit("join_room", id)
-    }
+    // Use a single global poll for production/dev
+    const GLOBAL_POLL_ID = 'global_poll'
+    dispatch(setPollId(GLOBAL_POLL_ID))
+    dispatch(setTeacher("Teacher"))
+    socket.emit("teacher:join", GLOBAL_POLL_ID)
+    localStorage.setItem("pollId", GLOBAL_POLL_ID)
   }, [])
 
   const updateOption = (i, text) => {
@@ -67,13 +55,8 @@ export default function TeacherHome() {
     dispatch(setActiveQuestion(q))
     dispatch(setTimer(timeLimit))
     navigate("/teacher/live")
-    if (!pollId) {
-      // pollId not ready yet — create one or warn
-      console.warn("Poll ID not ready — cannot emit question yet")
-      return
-    }
-
-    emitAskQuestion({ pollId, question, options: optionTexts, timeLimit })
+    // Always use global poll id
+    emitAskQuestion({ pollId: 'global_poll', question, options: optionTexts, timeLimit })
   };
 
 
