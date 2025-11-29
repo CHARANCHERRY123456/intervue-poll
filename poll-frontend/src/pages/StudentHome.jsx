@@ -64,13 +64,13 @@ export default function StudentHome() {
             />
 
             {/* Poll ID Input */}
-            <label className="block text-sm font-medium text-gray-700 mt-6 mb-2">Enter Poll ID(Ask Your Teacher or go to /teacher)</label>
+            {/* <label className="block text-sm font-medium text-gray-700 mt-6 mb-2">Enter Poll ID(Ask Your Teacher or go to /teacher)</label>
             <input
               value={pollCode}
               onChange={e => setPollCode(e.target.value)}
               placeholder="e.g., 8FD92K"
               className="w-full bg-gray-100 rounded-md p-4 text-gray-900 placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-500"
-            />
+            /> */}
 
             <div className="mt-10 flex justify-center">
               <button
