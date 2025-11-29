@@ -12,6 +12,7 @@ import {
   finalizeResults,
   clearActiveQuestion
 } from "../features/poll/pollSlice"
+import { setPollId } from "../features/poll/pollSlice"
 import { setKicked } from "../features/student/studentSlice";
 
 export const useSockets = () => {
@@ -52,6 +53,13 @@ export const useSockets = () => {
 
     socket.on("students:update", (list) => {
       dispatch(setStudents(list))
+    })
+
+    socket.on("student:joined", ({ pollId }) => {
+      if (pollId) {
+        dispatch(setPollId(pollId))
+        try { localStorage.setItem('pollId', pollId) } catch(e) {}
+      }
     })
 
     socket.on("student:kicked", () => {
